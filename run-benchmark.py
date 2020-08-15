@@ -18,6 +18,7 @@ BENCHMARKS = [
     ('aiohttp', 1),
     ('daphne-starlette', 1),
     ('sanic-own', 1),
+    ('uvicorn-quart', 1),
     ('uvicorn-sanic', 1),
     ('uvicorn-starlette', 1),
 ]
