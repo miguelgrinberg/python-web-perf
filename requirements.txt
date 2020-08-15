@@ -13,4 +13,5 @@ sanic~=19.12.2
 bottle~=0.12.18
 daphne~=2.5.0
 Quart==0.13.0
+aioflask==0.0.1
 requests-2.24.0
