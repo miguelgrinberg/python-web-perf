@@ -7,7 +7,7 @@ export REPO_BRANCH=master
 
 # dependencies
 sudo apt-get update
-sudo apt-get install -y build-essential git postgresql pgbouncer python3-dev python3-venv nginx apache2-utils
+sudo apt-get install -y build-essential git postgresql python3-dev python3-venv nginx apache2-utils
 
 # test repository
 if [[ ! -d $REPO_NAME ]]; then

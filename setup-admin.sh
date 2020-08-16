@@ -14,8 +14,6 @@ ln -s /etc/nginx/sites-available/perf /etc/nginx/sites-enabled/
 systemctl reload nginx
 
 # database
-cp pgbouncer/* /etc/pgbouncer/
-systemctl restart pgbouncer
 su -c "psql -c \"DROP DATABASE IF EXISTS $DB_NAME;\"" postgres
 su -c "psql -c \"CREATE DATABASE $DB_NAME;\"" postgres
 su -c "psql -c \"DROP USER IF EXISTS $DB_USER; CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';\"" postgres
