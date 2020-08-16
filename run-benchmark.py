@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import re
 import signal
@@ -9,27 +10,25 @@ import requests
 
 BENCHMARKS = [
     ('gunicorn-flask', 16),
-    ('gunicorn-gevent-flask', 4),
-    ('gunicorn-meinheld-bottle', 4),
-    ('gunicorn-meinheld-falcon', 4),
-    ('gunicorn-meinheld-flask', 4),
+    ('gunicorn-gevent-flask', 2),
+    ('gunicorn-meinheld-bottle', 2),
+    ('gunicorn-meinheld-falcon', 2),
+    ('gunicorn-meinheld-flask', 2),
     ('uwsgi-bottle', 16),
-    ('uwsgi-bottle-own-proto', 16),
     ('uwsgi-falcon', 16),
     ('uwsgi-flask', 16),
-    ('aiohttp', 4),
-    ('daphne-starlette', 4),
-    ('hypercorn-quart', 4),
-    ('sanic-own', 4),
-    ('uvicorn-aioflask', 4),
-    ('uvicorn-quart', 4),
-    ('uvicorn-sanic', 4),
-    ('uvicorn-starlette', 4),
+    ('aiohttp', 2),
+    ('daphne-starlette', 2),
+    ('hypercorn-quart', 2),
+    ('sanic-own', 2),
+    ('uvicorn-aioflask', 2),
+    ('uvicorn-quart', 2),
+    ('uvicorn-sanic', 2),
+    ('uvicorn-starlette', 2),
 ]
 URL = "http://127.0.0.1:8000/test"
-NSTART = 32
-NITER = 5
-NAVG = 1
+NUM_CLIENTS = 500
+NUM_CONNECTIONS = 100000
 
 RAM_BASELINE = psutil.virtual_memory().available
 
@@ -49,8 +48,8 @@ def stop_server(process):
     time.sleep(1)
 
 
-def run_ab(clients, url, name):
-    cmd = f'ab -c{clients} -n{clients * 10} {url}'
+def run_ab(clients, connections, url, name):
+    cmd = f'ab -c{clients} -n{connections} {url}'
     try:
         output = subprocess.check_output(cmd.split(), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
@@ -74,28 +73,8 @@ def run_benchmark(benchmark_name):
     # first make sure the server is running
     r = requests.get('http://localhost:8000/test')
     if r.status_code != 200 or 'a' not in r.json() or 'b' not in r.json():
-        return [None] * NITER
-    count = NSTART
-    results = []
-    for i in range(NITER):
-        print(f'{i+1}/{NITER}')
-        req = 0
-        cpu = 0
-        ram = 0
-        for j in range(NAVG):
-            _req, _cpu, _ram = run_ab(
-                count, URL, f'{benchmark_name}-{count}' + '' if NAVG == 1 else f'-{j}')
-            if _req is None:
-                return [None] * NITER
-            req += _req
-            cpu += _cpu
-            ram += _ram
-        req = round(req / NAVG)
-        cpu = round(cpu / NAVG)
-        ram = round(ram / NAVG)
-        results.append((req, cpu, ram))
-        count *= 2
-    return results
+        return None, None, None
+    return run_ab(count, URL, benchmark_name)
 
 
 def run():
@@ -129,13 +108,8 @@ def run():
             if proc:
                 stop_server(proc)
 
-    header = 'benchmark'
-    count = NSTART
-    for _ in range(NITER):
-        header += f',{count} connections'
-        count *= 2
-    print(header)
-    for benchmark, result in results.items():
+    print('benchmark', 'req', 'cpu', 'ram')
+    for benchmark, results in results.items():
         print(f'{benchmark},{",".join([str(r) for r in result])}')
 
 
