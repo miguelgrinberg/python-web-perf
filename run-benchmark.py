@@ -74,7 +74,7 @@ def run_benchmark(benchmark_name):
     r = requests.get('http://localhost:8000/test')
     if r.status_code != 200 or 'a' not in r.json() or 'b' not in r.json():
         return None, None, None
-    return run_ab(count, URL, benchmark_name)
+    return run_ab(NUM_CLIENTS, NUM_CONNECTIONS, URL, benchmark_name)
 
 
 def run():
@@ -110,7 +110,7 @@ def run():
 
     print('benchmark', 'req', 'cpu', 'ram')
     for benchmark, results in results.items():
-        print(f'{benchmark},{",".join([str(r) for r in result])}')
+        print(f'{benchmark},{",".join([str(result) for result in results])}')
 
 
 if __name__ == '__main__':

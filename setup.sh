@@ -15,6 +15,7 @@ if [[ ! -d $REPO_NAME ]]; then
 fi
 cd $REPO_NAME
 git checkout $REPO_BRANCH
+mkdir tmp
 
 # python
 if [[ ! -d venv ]]; then

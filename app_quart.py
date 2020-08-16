@@ -1,12 +1,12 @@
 from os import environ
 
-from quart import Quart
+from quart import Quart, jsonify
 from async_db import get_row
 
 app = Quart("python-web-perf")
 
 
 @app.route("/test")
-async def test(request):
+async def test():
     a, b = await get_row()
-    return {"a": str(a).zfill(10), "b": b}
+    return jsonify({"a": str(a).zfill(10), "b": b})
