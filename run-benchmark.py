@@ -27,8 +27,8 @@ BENCHMARKS = [
     ('uvicorn-starlette', 2),
 ]
 URL = "http://127.0.0.1:8000/test"
-NUM_CLIENTS = 500
-NUM_CONNECTIONS = 100000
+NUM_CLIENTS = 100
+NUM_CONNECTIONS = 10000
 
 RAM_BASELINE = psutil.virtual_memory().available
 
@@ -108,7 +108,7 @@ def run():
             if proc:
                 stop_server(proc)
 
-    print('benchmark', 'req', 'cpu', 'ram')
+    print('\nbenchmark,req,cpu,ram')
     for benchmark, results in results.items():
         print(f'{benchmark},{",".join([str(result) for result in results])}')
 

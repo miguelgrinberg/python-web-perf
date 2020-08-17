@@ -7,6 +7,6 @@ app = Flask("python-web-perf")
 
 
 @app.route("/test")
-async def test(request):
+async def test():
     a, b = await get_row()
     return {"a": str(a).zfill(10), "b": b}
