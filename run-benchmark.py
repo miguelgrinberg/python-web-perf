@@ -56,17 +56,20 @@ def run_ab(clients, connections, url, name):
         output = exc.output + b'\nExit code: ' + str(exc.returncode).encode(
             'utf-8')
         req = None
+        err = None
         cpu = None
         ram = None
     else:
         cpu = psutil.cpu_percent()
         ram = psutil.virtual_memory()
-        ram = (RAM_BASELINE - ram.available) * 100 // ram.total
+        ram = RAM_BASELINE - ram.available
         match = re.search(b'Requests per second:\\s+([0-9\\.]+)', output)
-        req = float(match.group(1))
+        req = round(float(match.group(1)))
+        match = re.search(b'Failed requests:\\s+([0-9\\.]+)', output)
+        err = int(match.group(1))
     with open(f'tmp/{name}.txt', 'wt') as f:
         f.write(output.decode('utf-8'))
-    return req, cpu, ram
+    return req, err, cpu, ram
 
 
 def run_benchmark(benchmark_name):
@@ -108,7 +111,7 @@ def run():
             if proc:
                 stop_server(proc)
 
-    print('\nbenchmark,req,cpu,ram')
+    print('\nbenchmark,req,err,cpu,ram')
     for benchmark, results in results.items():
         print(f'{benchmark},{",".join([str(result) for result in results])}')
 
