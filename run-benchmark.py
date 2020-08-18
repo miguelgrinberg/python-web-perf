@@ -27,8 +27,8 @@ BENCHMARKS = [
     ('uvicorn-starlette', 2),
 ]
 URL = "http://127.0.0.1:8000/test"
-NUM_CLIENTS = 100
-NUM_CONNECTIONS = 10000
+NUM_CLIENTS = 200
+NUM_CONNECTIONS = 20000
 
 RAM_BASELINE = psutil.virtual_memory().available
 
@@ -60,7 +60,7 @@ def run_ab(clients, connections, url, name):
         cpu = None
         ram = None
     else:
-        cpu = psutil.cpu_percent()
+        cpu = round(psutil.cpu_percent())
         ram = psutil.virtual_memory()
         ram = RAM_BASELINE - ram.available
         match = re.search(b'Requests per second:\\s+([0-9\\.]+)', output)
@@ -83,13 +83,13 @@ def run_benchmark(benchmark_name):
 def run():
     psutil.cpu_percent()  # make first call to initialize metric
     benchmark = sys.argv[1] if len(sys.argv) > 1 else None
-    results = {}
+    results = []
     if len(sys.argv) <= 1:
         for benchmark, workers in BENCHMARKS:
             benchmark_name = f'{benchmark}-x{workers}'
             print(benchmark_name)
             proc = start_server(benchmark, workers)
-            results[benchmark_name] = run_benchmark(benchmark_name)
+            results.append((benchmark_name, run_benchmark(benchmark_name)))
             stop_server(proc)
     else:
         for benchmark in sys.argv[1:]:
@@ -105,14 +105,15 @@ def run():
                 proc = start_server(benchmark, workers)
                 benchmark_name = f'{benchmark}-x{workers}'
             else:
-                benchmark_name = f'current'
+                benchmark_name = 'current'
             print(benchmark_name)
-            results[benchmark_name] = run_benchmark(benchmark)
+            results.append((benchmark_name, run_benchmark(benchmark)))
             if proc:
                 stop_server(proc)
 
     print('\nbenchmark,req,err,cpu,ram')
-    for benchmark, results in results.items():
+    results = sorted(results, key=lambda x: x[1][0], reverse=True)
+    for benchmark, results in results:
         print(f'{benchmark},{",".join([str(result) for result in results])}')
 
 
