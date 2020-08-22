@@ -1,0 +1,34 @@
+version: '3.1'
+
+services:
+
+  db:
+    container_name: perf-db
+    image: postgres:alpine
+    restart: always
+    volumes:
+      - ./data.csv:/tmp/data.csv
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+
+  server:
+    container_name: perf-server
+    image: nginx:stable-alpine
+    restart: always
+    volumes:
+      - ./nginx-docker.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8000:8000
+
+  #app:
+  #  container_name: perf-app
+  #  build: .
+  #  #image: perf-app:latest
+  #  restart: always
+  #  environment:
+  #    PWPWORKERS: 1
+  #  entrypoint: ./serve-aiohttp.sh
+  #  expose:
+  #    - 8001
