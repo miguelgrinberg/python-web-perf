@@ -13,6 +13,7 @@ sanic
 bottle
 daphne
 Quart
+fastapi
 aioflask
 requests
 psutil

@@ -5,7 +5,7 @@
 [[ -z "$NUM_WORKERS_SYNC" ]] && NUM_WORKERS_SYNC=16
 [[ -z "$NUM_WORKERS_ASYNC" ]] && NUM_WORKERS_ASYNC=6
 
-ALL_TESTS=$(cat tests.txt | schuf)
+ALL_TESTS=$(cat tests.txt | shuf)
 
 if [[ "$@" != "" ]]; then
     ALL_TESTS="$@"

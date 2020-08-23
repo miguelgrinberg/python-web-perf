@@ -1,5 +1,3 @@
-from os import environ
-
 from aioflask import Flask
 from async_db import get_row
 
