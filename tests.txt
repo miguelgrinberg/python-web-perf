@@ -9,7 +9,9 @@ uwsgi-flask
 aiohttp
 hypercorn-quart
 sanic-own
+tornado
 uvicorn-aioflask
+uvicorn-fastapi
 uvicorn-quart
 uvicorn-sanic
 uvicorn-starlette

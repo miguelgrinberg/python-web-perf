@@ -14,6 +14,7 @@ bottle
 daphne
 Quart
 fastapi
+tornado
 aioflask
 requests
 psutil
