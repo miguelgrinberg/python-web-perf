@@ -1,4 +1,8 @@
+gunicorn-bottle
+gunicorn-falcon
 gunicorn-flask
+gunicorn-gevent-bottle
+gunicorn-gevent-falcon
 gunicorn-gevent-flask
 gunicorn-meinheld-bottle
 gunicorn-meinheld-falcon

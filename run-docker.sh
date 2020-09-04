@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 [[ -z "$NUM_CLIENTS" ]] && NUM_CLIENTS=100
-[[ -z "$NUM_CONNECTIONS" ]] && NUM_CONNECTIONS=100000
+[[ -z "$NUM_CONNECTIONS" ]] && NUM_CONNECTIONS=30000
 [[ -z "$NUM_WORKERS_SYNC" ]] && NUM_WORKERS_SYNC=16
 [[ -z "$NUM_WORKERS_ASYNC" ]] && NUM_WORKERS_ASYNC=6
 
@@ -22,8 +22,8 @@ if [[ "$ALREADY_UP" == "" ]]; then
     fi
     docker-compose up -d
     sleep 2
-    docker-compose run --rm -e PGPASSWORD=test db psql -h perf-db -U test < schema.sql
-    docker-compose run --rm -e PGPASSWORD=test db psql -h perf-db -U test -c "COPY test FROM '/tmp/data.csv' DELIMITER ',' CSV HEADER;"
+    docker-compose run --rm -e PGPASSWORD=test dbpool psql -h perf-dbpool -U test < schema.sql
+    docker-compose run --rm -e PGPASSWORD=test dbpool psql -h perf-dbpool -U test -c "COPY test FROM '/tmp/data.csv' DELIMITER ',' CSV HEADER;"
 fi
 
 docker build -t perf-app .
@@ -52,6 +52,11 @@ for test in $ALL_TESTS; do
     $(docker run --rm --name perf-test --network container:perf-server jordi/ab -c$NUM_CLIENTS -n$NUM_CONNECTIONS http://localhost:8000/test | python ab2json.py > runs/$test-x$PWPWORKERS.json)
     kill $MONITOR_PID
     docker rm -f perf-app
+    DB_CONN=$(docker-compose run --rm -e PGPASSWORD=postgres db psql -h perf-dbpool -U postgres -P pager=off -c "show servers;" pgbouncer | wc -l)
+    DB_CONN=$((DB_CONN-4))
+    docker-compose run --rm -e PGPASSWORD=postgres db psql -h perf-dbpool -U postgres -c "kill test;" pgbouncer
+    docker-compose run --rm -e PGPASSWORD=postgres db psql -h perf-dbpool -U postgres -c "resume test;" pgbouncer
+    echo $DB_CONN > runs/$test-x$PWPWORKERS.db
 done
 
 if [[ "$ALREADY_UP" == "" ]]; then

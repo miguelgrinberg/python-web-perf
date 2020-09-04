@@ -20,8 +20,13 @@ def gen_report(reqs):
         workers = int(test.split('-x')[1].split('.')[0])
         if len(deps) == 1:
             deps = [deps[0], deps[0]]
-        with open(test) as f:
-            results = json.loads(f.read())
+        try:
+            with open(test) as f:
+                results = json.loads(f.read())
+        except:
+            continue
+        with open(test.replace('.json', '.db')) as f:
+            db_connections = int(f.read().strip())
         with open(test.replace('.json', '.perf')) as f:
             f.readline()
             cpu = 0
@@ -49,8 +54,9 @@ def gen_report(reqs):
             results['requests_per_second'],
             results['percentages']['50%'],
             results['percentages']['99%'],
-            results['complete_requests'],
-            results['failed_requests'],
+            db_connections,
+            int(results['complete_requests']),
+            int(results.get('non-2xx_responses', 0)),
             cpu,
             ram,
             net_in,
@@ -65,8 +71,9 @@ def gen_report(reqs):
         'reqs/sec',
         'P50',
         'P99',
-        'total reqs',
-        'failed reqs',
+        'db_sessions',
+        'total_reqs',
+        'failed_reqs',
         'cpu_%',
         'ram_mb',
         'net_in_mb',

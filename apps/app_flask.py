@@ -4,7 +4,6 @@ from sync_db import get_row
 
 app = flask.Flask("python-web-perf")
 
-pool = None
 
 @app.route("/test")
 def test():

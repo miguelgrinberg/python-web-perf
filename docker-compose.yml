@@ -13,6 +13,21 @@ services:
       POSTGRES_PASSWORD: test
       POSTGRES_DB: test
 
+  dbpool:
+    container_name: perf-dbpool
+    image: edoburu/pgbouncer
+    restart: always
+    volumes:
+      - ./pgbouncer-userlist.txt:/etc/pgbouncer/userlist.txt
+    environment:
+      POOL_MODE: session
+      DB_HOST: perf-db
+      DB_USER: test
+      DB_PASSWORD: test
+      DB_NAME: test
+      MAX_CLIENT_CONN: 2000
+      DEFAULT_POOL_SIZE: 100
+
   server:
     container_name: perf-server
     image: nginx:stable-alpine
@@ -21,14 +36,3 @@ services:
       - ./nginx-docker.conf:/etc/nginx/nginx.conf
     ports:
       - 8000:8000
-
-  #app:
-  #  container_name: perf-app
-  #  build: .
-  #  #image: perf-app:latest
-  #  restart: always
-  #  environment:
-  #    PWPWORKERS: 1
-  #  entrypoint: ./serve-aiohttp.sh
-  #  expose:
-  #    - 8001
