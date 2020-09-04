@@ -1,3 +1,9 @@
 .mypy_cache/
 __pycache__/
 test.csv
+Vagrantfile
+.vagrant
+*.log
+venv
+data.csv
+runs/*
