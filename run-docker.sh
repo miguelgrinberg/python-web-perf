@@ -1,9 +1,11 @@
 #!/bin/bash -e
 
 [[ -z "$NUM_CLIENTS" ]] && NUM_CLIENTS=100
-[[ -z "$NUM_CONNECTIONS" ]] && NUM_CONNECTIONS=30000
-[[ -z "$NUM_WORKERS_SYNC" ]] && NUM_WORKERS_SYNC=13
+[[ -z "$NUM_CONNECTIONS" ]] && NUM_CONNECTIONS=50000
+[[ -z "$NUM_WORKERS_SYNC" ]] && NUM_WORKERS_SYNC=19
 [[ -z "$NUM_WORKERS_ASYNC" ]] && NUM_WORKERS_ASYNC=6
+[[ -z "$NUM_DB_SESSIONS" ]] && NUM_DB_SESSIONS=100
+[[ -z "$DB_SLEEP" ]] && DB_SLEEP=0.02
 
 ALL_TESTS=$(cat tests.txt | shuf)
 
@@ -20,7 +22,7 @@ if [[ "$ALREADY_UP" == "" ]]; then
     if [[ ! -f data.csv ]]; then
         ./gen_test_data.py
     fi
-    docker-compose up -d
+    NUM_DB_SESSIONS=$NUM_DB_SESSIONS docker-compose up -d
     sleep 2
     docker-compose run --rm -e PGPASSWORD=test dbpool psql -h perf-dbpool -U test < schema.sql
     docker-compose run --rm -e PGPASSWORD=test dbpool psql -h perf-dbpool -U test -c "COPY test FROM '/tmp/data.csv' DELIMITER ',' CSV HEADER;"
@@ -45,7 +47,7 @@ for test in $ALL_TESTS; do
         PWPWORKERS=$NUM_WORKERS
     fi
     echo Running $test x$PWPWORKERS
-    docker run --rm -d --name perf-app --network container:perf-server -e PWPWORKERS=$PWPWORKERS perf-app ./serve-$test.sh
+    docker run --rm -d --name perf-app --network container:perf-server -e PWPWORKERS=$PWPWORKERS -e DB_SLEEP=$DB_SLEEP perf-app ./serve-$test.sh
     sleep 2
     ./monitor-app.sh $test-x$PWPWORKERS &
     MONITOR_PID=$!

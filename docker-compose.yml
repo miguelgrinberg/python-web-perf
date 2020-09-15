@@ -26,7 +26,7 @@ services:
       DB_PASSWORD: test
       DB_NAME: test
       MAX_CLIENT_CONN: 2000
-      DEFAULT_POOL_SIZE: 100
+      DEFAULT_POOL_SIZE: ${NUM_DB_SESSIONS}
 
   server:
     container_name: perf-server
