@@ -8,7 +8,7 @@ aiopg
 psycopg2-binary
 gevent
 psycogreen
-meinheld
+git+https://github.com/idot/meinheld.git@2bfe452#egg=meinheld
 falcon
 sanic
 bottle
