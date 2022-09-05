@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-from glob import glob
 import json
+from glob import glob
+
 import bitmath
 
 
@@ -8,7 +9,11 @@ def read_requirements():
     reqs = {}
     with open('runs/requirements.txt') as f:
         for line in f.readlines():
-            pkg, version = line.strip().split('==')
+            if ' @ ' in line:
+                pkg = line.strip().split(' @ ')[0]
+                version = line.strip().split('@')[-1][:7]
+            else:
+                pkg, version = line.strip().split('==')
             reqs[pkg.lower()] = (pkg, version)
     return reqs
 

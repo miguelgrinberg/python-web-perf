@@ -1,2 +1,2 @@
-"test" "md505a671c66aefea124cc08b76ea6d30bb"
-"postgres" "md53175bce1d3201d16594cebf9d7eb3f9d"
+"test" "test"
+"postgres" "postgres"
