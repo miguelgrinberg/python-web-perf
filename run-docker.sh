@@ -90,22 +90,22 @@ for test in $ALL_TESTS; do
     while true; do
         HTTP_STATUS=$(curl --silent -o /dev/null -w "%{http_code}" http://localhost:8000/test)
         CURL_STATUS=$?
+        echo -n -e "\r\033[1A\033[0K"  # Clear previous line
+        echo -n "Warming up (curl exit code $CURL_STATUS, HTTP status $HTTP_STATUS)"
+        WARMUP=$((WARMUP+1))
+        printf '%*s\n' $WARMUP | tr ' ' '.'
         if [[ $CURL_STATUS == 0 ]]; then
             if [[ $HTTP_STATUS == "200" ]]; then
                 break
             fi
         fi
-        echo -n -e "\r\033[1A\033[0K"  # Clear previous line
-        echo -n "Warming up (curl exit code $CURL_STATUS, HTTP code $HTTP_STATUS)"
-        WARMUP=$((WARMUP+1))
-        printf '%*s\n' $WARMUP | tr ' ' '.'
-        sleep 1
-        if [[ $WARMUP -ge $WARMUP_SECONDS ]]; then
+        if [[ $WARMUP -gt $WARMUP_SECONDS ]]; then
             echo "App failed to start, skipping test"
             SKIP_TEST=1
             echo $test >> failed.txt
             break
         fi
+        sleep 1
     done
     if [[ "$SKIP_TEST" == "" ]]; then
         ./monitor-app.sh $test-x$PWPWORKERS &

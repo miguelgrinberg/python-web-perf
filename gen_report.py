@@ -11,7 +11,7 @@ def read_requirements():
         for line in f.readlines():
             if ' @ ' in line:
                 pkg = line.strip().split(' @ ')[0]
-                version = line.strip().split('@')[-1]
+                version = line.strip().split('@')[-1][:7]
             else:
                 pkg, version = line.strip().split('==')
             reqs[pkg.lower()] = (pkg, version)
